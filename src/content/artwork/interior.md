@@ -1,15 +1,15 @@
 ---
-title: Interior
-year: 2025
-category: painting
-series: Interiors
-medium: Oil on canvas
-dimensions: 24 × 30 in.
-publicId: painting/13
-alt: An oil painting titled Interior
+title: Cling Film 2
+year: 2020
+category: drawing
+series: ""
+medium: Graphite on paper
+dimensions: "12 x 12 in. "
+publicId: drawing/13
+alt: Graphite drawing of plastic sheeting.
 featured: true
 available: true
 order: 20
 tags:
-  - interior
+  - still-life
 ---

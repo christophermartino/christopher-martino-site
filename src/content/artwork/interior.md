@@ -1,12 +1,12 @@
 ---
-title: Cling Film 2
+title: Recliner
 year: 2020
 category: drawing
 series: ""
 medium: Graphite on paper
-dimensions: "12 x 12 in. "
+dimensions: "10 x 10 in. "
 publicId: drawing/13
-alt: Graphite drawing of plastic sheeting.
+alt: Graphite drawing of armchair recliner.
 featured: true
 available: true
 order: 20

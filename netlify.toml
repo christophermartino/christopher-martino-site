@@ -4,6 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  PUBLIC_SITE_URL = "https://christopher-martino-site.netlify.app"
 
 [[headers]]
   for = "/*"

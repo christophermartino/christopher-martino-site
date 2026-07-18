@@ -27,15 +27,19 @@ PUBLIC_SITE_URL=http://localhost:4321
 
 ## Decap authentication
 
-`public/admin/config.yml` currently uses Decap's GitHub backend. Replace:
+`public/admin/config.yml` uses Decap's GitHub backend for
+`christophermartino/christopher-martino-site`, with Netlify's OAuth provider.
+Before editors can sign in on the production `/admin/` page:
 
-```yaml
-repo: YOUR_GITHUB_USERNAME/christopher-martino-site
-```
+1. Create a GitHub OAuth App with callback URL `https://api.netlify.com/auth/done`.
+2. In Netlify, open **Project configuration → Access & security → OAuth** and
+   install the GitHub provider using that app's Client ID and Client Secret.
 
-with your actual GitHub username.
+Keep the Client Secret only in Netlify; never commit it to this repository.
 
-The GitHub backend avoids depending on Netlify Git Gateway, which Netlify now marks as deprecated for new configurations. You will need to configure a GitHub OAuth authentication provider before production use. Decap can also be switched to another supported backend later.
+`PUBLIC_SITE_URL` is required for production builds. Set it in Netlify to the
+canonical HTTPS URL (for example, `https://www.your-domain.com`) so Astro emits
+correct canonical URLs and sitemap entries.
 
 ## Cloudinary
 

@@ -17,7 +17,10 @@ const links = [
       {links.map(([href, label]) => (
         <a href={href} aria-current={path.startsWith(href) ? 'page' : undefined}>{label}</a>
       ))}
-      <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme">◐</button>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle color theme">
+        <span aria-hidden="true">◐</span>
+        <span>Theme</span>
+      </button>
     </nav>
 
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">
@@ -28,7 +31,10 @@ const links = [
   <div id="mobile-menu" class="mobile-menu" hidden>
     <nav class="mobile-nav container" aria-label="Mobile navigation">
       {links.map(([href, label]) => <a href={href}>{label}</a>)}
-      <button class="text-link" type="button" data-theme-toggle>Toggle theme</button>
+      <button class="theme-toggle" type="button" data-theme-toggle>
+        <span aria-hidden="true">◐</span>
+        <span>Toggle theme</span>
+      </button>
     </nav>
   </div>
 </header>
@@ -104,11 +110,37 @@ const links = [
     text-underline-offset: 0.3em;
   }
 
-  .icon-button,
   .menu-toggle {
     border: 0;
     background: transparent;
     padding: 0.4rem;
+  }
+
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 2.4rem;
+    border: var(--border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    padding: 0.45rem 0.8rem;
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .theme-toggle:hover {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--color-text);
+    outline-offset: 3px;
   }
 
   .menu-toggle { display: none; }

@@ -1,16 +1,16 @@
 ---
-title: Red Room
-year: 2024
+title: Cordoruy
+year: 2021
 category: painting
-series: Interiors
-medium: Oil on panel
-dimensions: 20 × 16 in.
-publicId: painting/14
-alt: An oil painting titled Red Room
+series: Satellites
+medium: Oil on linen
+dimensions: "22 x 30 in. "
+publicId: painting/46
+alt: An oil painting.
 featured: true
 available: false
-order: 40
+order: 1
 tags:
-  - interior
-  - red
+  - couches
+  - interiors
 ---

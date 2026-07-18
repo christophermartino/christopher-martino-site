@@ -3,7 +3,7 @@ title: Dyptich
 year: 2019
 category: drawing
 series: Plastics
-medium: 
+medium: Graphite on paper
 dimensions: Variable
 publicId: drawing/15
 alt: 2 drawings of plastic

@@ -1,0 +1,29 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ArtworkCard from './ArtworkCard.astro';
+
+interface Props {
+  works: CollectionEntry<'artwork'>[];
+  priorityCount?: number;
+}
+const { works, priorityCount = 0 } = Astro.props;
+---
+<div class="artwork-grid">
+  {works.map((artwork, index) => <ArtworkCard artwork={artwork} priority={index < priorityCount} />)}
+</div>
+
+<style>
+  .artwork-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--space-12) var(--space-6);
+  }
+  .artwork-grid > :global(*) { grid-column: span 4; }
+  @media (max-width: 980px) {
+    .artwork-grid > :global(*) { grid-column: span 6; }
+  }
+  @media (max-width: 620px) {
+    .artwork-grid { gap-block: var(--space-8); }
+    .artwork-grid > :global(*) { grid-column: 1 / -1; }
+  }
+</style>

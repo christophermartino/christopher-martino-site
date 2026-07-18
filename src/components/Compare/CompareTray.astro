@@ -1,0 +1,96 @@
+<div class="compare-tray" data-compare-tray hidden>
+  <div>
+    <strong data-compare-count>0 selected</strong>
+    <span>Select two works to compare.</span>
+  </div>
+  <div class="actions">
+    <button type="button" data-clear-compare>Clear</button>
+    <a href="/compare/">Compare</a>
+  </div>
+</div>
+
+<div class="compare-toast" data-compare-toast hidden role="status">
+  Compare supports two works at a time.
+</div>
+
+<script>
+  const key = 'cm-compare';
+
+  const read = (): string[] => {
+    try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+    catch { return []; }
+  };
+
+  const updateTray = () => {
+    const tray = document.querySelector<HTMLElement>('[data-compare-tray]');
+    const count = document.querySelector<HTMLElement>('[data-compare-count]');
+    const selected = read();
+    if (!tray || !count) return;
+    tray.hidden = selected.length === 0;
+    count.textContent = `${selected.length} selected`;
+  };
+
+  const bind = () => {
+    const clear = document.querySelector<HTMLButtonElement>('[data-clear-compare]');
+    if (clear && clear.dataset.bound !== 'true') {
+      clear.dataset.bound = 'true';
+      clear.addEventListener('click', () => {
+        localStorage.removeItem(key);
+        window.dispatchEvent(new CustomEvent('compare-change'));
+      });
+    }
+
+    window.addEventListener('compare-change', updateTray);
+    window.addEventListener('compare-limit', () => {
+      const toast = document.querySelector<HTMLElement>('[data-compare-toast]');
+      if (!toast) return;
+      toast.hidden = false;
+      window.setTimeout(() => { toast.hidden = true; }, 2400);
+    });
+    updateTray();
+  };
+
+  document.addEventListener('astro:page-load', bind);
+  bind();
+</script>
+
+<style>
+  .compare-tray {
+    position: fixed;
+    z-index: 30;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    max-width: 42rem;
+    margin-inline: auto;
+    background: var(--color-text);
+    color: var(--color-inverse);
+    padding: var(--space-4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .compare-tray[hidden] { display: none; }
+  .compare-tray strong,
+  .compare-tray span { display: block; }
+  .compare-tray span { opacity: 0.7; font-size: var(--step--1); }
+  .actions { display: flex; gap: var(--space-3); align-items: center; }
+  .actions button,
+  .actions a {
+    border: 1px solid currentColor;
+    background: transparent;
+    color: inherit;
+    padding: 0.5rem 0.75rem;
+  }
+  .compare-toast {
+    position: fixed;
+    z-index: 35;
+    left: 50%;
+    bottom: 6.5rem;
+    transform: translateX(-50%);
+    background: var(--color-text);
+    color: var(--color-inverse);
+    padding: 0.75rem 1rem;
+  }
+</style>

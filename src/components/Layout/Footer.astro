@@ -1,0 +1,26 @@
+<footer class="footer">
+  <div class="container footer-grid">
+    <p>Christopher Martino</p>
+    <p>New York</p>
+    <p class="copyright">© {new Date().getFullYear()}</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: var(--border);
+    padding-block: var(--space-8);
+    color: var(--color-muted);
+    font-size: var(--step--1);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: var(--space-4);
+  }
+  .footer p { margin: 0; }
+  @media (max-width: 600px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .copyright { grid-column: 1 / -1; }
+  }
+</style>

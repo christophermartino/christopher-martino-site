@@ -1,0 +1,156 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArtworkImage from '../../components/Artwork/ArtworkImage.astro';
+
+const works = await getCollection('artwork');
+const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || '';
+const cloudinaryFolder = import.meta.env.PUBLIC_CLOUDINARY_FOLDER || '';
+
+const serializable = works.map((work) => ({
+  id: work.id,
+  title: work.data.title,
+  year: work.data.year,
+  category: work.data.category,
+  medium: work.data.medium,
+  dimensions: work.data.dimensions || '',
+  series: work.data.series || '',
+  publicId: work.data.publicId,
+  alt: work.data.alt
+}));
+---
+<BaseLayout title="Compare Works">
+  <div class="page container">
+    <header class="compare-header">
+      <div>
+        <p class="eyebrow">Side by Side</p>
+        <h1 class="page-title">Compare Works</h1>
+      </div>
+      <button class="pill" type="button" data-clear>Clear selection</button>
+    </header>
+
+    <p class="compare-instructions" data-instructions>Select up to two works from the Works page.</p>
+
+    <div class="compare-grid" data-compare-grid aria-live="polite"></div>
+
+    <noscript>
+      <p class="empty-state">The comparison view requires JavaScript.</p>
+    </noscript>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ serializable, cloudName, cloudinaryFolder }}>
+  const key = 'cm-compare';
+  const works = serializable;
+
+  const imageUrl = (publicId, width = 1400) => {
+    const cloud = cloudName;
+    const folder = cloudinaryFolder.replace(/^\/+|\/+$/g, '');
+    const clean = publicId.replace(/^\/+|\/+$/g, '');
+    if (!cloud) return '';
+    const path = folder && !clean.startsWith(`${folder}/`) ? `${folder}/${clean}` : clean;
+    return `https://res.cloudinary.com/${cloud}/image/upload/f_auto,q_auto,w_${width},c_limit/${path}`;
+  };
+
+  const read = () => {
+    try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+    catch { return []; }
+  };
+
+  const render = () => {
+    const grid = document.querySelector('[data-compare-grid]');
+    const instructions = document.querySelector('[data-instructions]');
+    if (!grid || !instructions) return;
+
+    const ids = read();
+    const selected = ids.map((id) => works.find((work) => work.id === id)).filter(Boolean);
+    instructions.hidden = selected.length > 0;
+
+    if (!selected.length) {
+      grid.innerHTML = `<div class="empty-state">No works selected. Visit <a href="/works/">Works</a> and choose “Compare.”</div>`;
+      return;
+    }
+
+    grid.innerHTML = selected.map((work) => {
+      const src = imageUrl(work.publicId);
+      const visual = src
+        ? `<img src="${src}" alt="${work.alt}" />`
+        : `<div class="compare-placeholder">Cloudinary image<br><small>${work.publicId}</small></div>`;
+
+      return `
+        <article class="compare-work">
+          <div class="compare-image">${visual}</div>
+          <h2>${work.title}</h2>
+          <dl>
+            <div><dt>Year</dt><dd>${work.year}</dd></div>
+            <div><dt>Category</dt><dd>${work.category}</dd></div>
+            <div><dt>Medium</dt><dd>${work.medium}</dd></div>
+            ${work.dimensions ? `<div><dt>Dimensions</dt><dd>${work.dimensions}</dd></div>` : ''}
+            ${work.series ? `<div><dt>Series</dt><dd>${work.series}</dd></div>` : ''}
+          </dl>
+          <a href="/works/${work.id}/">View work →</a>
+        </article>`;
+    }).join('');
+  };
+
+  const clear = document.querySelector('[data-clear]');
+  clear?.addEventListener('click', () => {
+    localStorage.removeItem(key);
+    render();
+  });
+
+  render();
+</script>
+
+<style>
+  .compare-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: var(--space-6);
+    margin-bottom: var(--space-12);
+  }
+  .compare-instructions { color: var(--color-muted); }
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8);
+  }
+  .compare-grid :global(.empty-state) { grid-column: 1 / -1; }
+  .compare-grid :global(.compare-image) {
+    display: grid;
+    place-items: center;
+    min-height: 24rem;
+    background: var(--color-surface);
+  }
+  .compare-grid :global(img) {
+    width: 100%;
+    height: min(58vh, 44rem);
+    object-fit: contain;
+  }
+  .compare-grid :global(.compare-placeholder) {
+    color: var(--color-muted);
+    text-align: center;
+  }
+  .compare-grid :global(h2) {
+    margin: var(--space-4) 0;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 400;
+  }
+  .compare-grid :global(dl) { margin: 0 0 var(--space-4); }
+  .compare-grid :global(dl div) {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    border-top: var(--border);
+    padding-block: var(--space-2);
+    font-size: var(--step--1);
+  }
+  .compare-grid :global(dt) { color: var(--color-muted); }
+  .compare-grid :global(dd) { margin: 0; }
+  .compare-grid :global(article > a) { font-size: var(--step--1); }
+  @media (max-width: 720px) {
+    .compare-header { display: grid; align-items: start; }
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+</style>

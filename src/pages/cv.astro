@@ -1,0 +1,34 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const page = await getEntry('pages', 'cv');
+if (!page) throw new Error('Missing src/content/pages/cv.md');
+const { Content } = await render(page);
+---
+<BaseLayout title={page.data.title}>
+  <div class="page container editorial-page">
+    <header>
+      <p class="eyebrow">Selected</p>
+      <h1 class="page-title">{page.data.title}</h1>
+    </header>
+    <div class="prose cv-content"><Content /></div>
+  </div>
+</BaseLayout>
+
+<style>
+  .editorial-page {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--space-16);
+  }
+  .cv-content :global(h2) {
+    margin-top: var(--space-12);
+    padding-top: var(--space-4);
+    border-top: var(--border);
+  }
+  .cv-content :global(h2:first-child) { margin-top: 0; }
+  @media (max-width: 720px) {
+    .editorial-page { grid-template-columns: 1fr; gap: var(--space-8); }
+  }
+</style>

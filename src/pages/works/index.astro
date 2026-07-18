@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArtworkGrid from '../../components/Artwork/ArtworkGrid.astro';
+import CompareTray from '../../components/Compare/CompareTray.astro';
+import { sortArtwork } from '../../lib/artwork';
+
+const works = sortArtwork(await getCollection('artwork'));
+---
+<BaseLayout title="Works">
+  <div class="page container">
+    <header class="works-header">
+      <div>
+        <p class="eyebrow">Artwork</p>
+        <h1 class="page-title">Works</h1>
+      </div>
+      <div class="filters" aria-label="Filter works">
+        <button class="pill is-active" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="pill" type="button" data-filter="painting" aria-pressed="false">Paintings</button>
+        <button class="pill" type="button" data-filter="drawing" aria-pressed="false">Drawings</button>
+        <button class="pill" type="button" data-filter="digital" aria-pressed="false">Digital</button>
+      </div>
+    </header>
+
+    <div data-works-grid>
+      <ArtworkGrid works={works} priorityCount={3} />
+    </div>
+    <p class="empty-state" data-empty hidden>No works match this filter.</p>
+  </div>
+  <CompareTray />
+</BaseLayout>
+
+<script>
+  const bindFilters = () => {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    if (!buttons.length || buttons[0].dataset.bound === 'true') return;
+    buttons.forEach((button) => button.dataset.bound = 'true');
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const value = button.dataset.filter || 'all';
+        buttons.forEach((item) => {
+          const active = item === button;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-pressed', String(active));
+        });
+        let visible = 0;
+        document.querySelectorAll<HTMLElement>('[data-category]').forEach((card) => {
+          const show = value === 'all' || card.dataset.category === value;
+          card.hidden = !show;
+          if (show) visible++;
+        });
+        const empty = document.querySelector<HTMLElement>('[data-empty]');
+        if (empty) empty.hidden = visible > 0;
+      });
+    });
+  };
+  document.addEventListener('astro:page-load', bindFilters);
+  bindFilters();
+</script>
+
+<style>
+  .works-header {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-8);
+    align-items: end;
+    margin-bottom: var(--space-12);
+  }
+  .filters { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+  [hidden] { display: none !important; }
+  @media (max-width: 720px) {
+    .works-header { display: grid; align-items: start; }
+  }
+</style>

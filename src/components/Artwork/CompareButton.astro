@@ -1,0 +1,64 @@
+---
+interface Props {
+  id: string;
+  title: string;
+}
+const { id, title } = Astro.props;
+---
+<button class="compare-button" type="button" data-compare-id={id} data-compare-title={title}>
+  + Compare
+</button>
+
+<script>
+  const key = 'cm-compare';
+
+  const getSelection = (): string[] => {
+    try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+    catch { return []; }
+  };
+
+  const refresh = () => {
+    const selected = getSelection();
+    document.querySelectorAll<HTMLButtonElement>('[data-compare-id]').forEach((button) => {
+      const active = selected.includes(button.dataset.compareId || '');
+      button.textContent = active ? '− Remove' : '+ Compare';
+      button.setAttribute('aria-pressed', String(active));
+    });
+  };
+
+  const bind = () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-compare-id]').forEach((button) => {
+      if (button.dataset.bound === 'true') return;
+      button.dataset.bound = 'true';
+      button.addEventListener('click', () => {
+        const id = button.dataset.compareId;
+        if (!id) return;
+        let selected = getSelection();
+        if (selected.includes(id)) selected = selected.filter((item) => item !== id);
+        else if (selected.length < 2) selected = [...selected, id];
+        else {
+          window.dispatchEvent(new CustomEvent('compare-limit'));
+          return;
+        }
+        localStorage.setItem(key, JSON.stringify(selected));
+        refresh();
+        window.dispatchEvent(new CustomEvent('compare-change', { detail: selected }));
+      });
+    });
+    refresh();
+  };
+
+  document.addEventListener('astro:page-load', bind);
+  bind();
+</script>
+
+<style>
+  .compare-button {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: var(--color-muted);
+    font-size: var(--step--1);
+  }
+  .compare-button[aria-pressed='true'] { color: var(--color-text); }
+</style>

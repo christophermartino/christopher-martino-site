@@ -1,0 +1,148 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArtworkImage from '../../components/Artwork/ArtworkImage.astro';
+import CompareButton from '../../components/Artwork/CompareButton.astro';
+import CompareTray from '../../components/Compare/CompareTray.astro';
+import { cloudinaryUrl } from '../../lib/cloudinary';
+import { sortArtwork, categoryLabel } from '../../lib/artwork';
+
+export async function getStaticPaths() {
+  const works = await getCollection('artwork');
+  return works.map((work) => ({
+    params: { id: work.id },
+    props: { work }
+  }));
+}
+
+const { work } = Astro.props;
+const { Content } = await render(work);
+const allWorks = sortArtwork(await getCollection('artwork'));
+const currentIndex = allWorks.findIndex((item) => item.id === work.id);
+const previous = allWorks[(currentIndex - 1 + allWorks.length) % allWorks.length];
+const next = allWorks[(currentIndex + 1) % allWorks.length];
+const socialImage = cloudinaryUrl(work.data.publicId, 'hero');
+---
+<BaseLayout title={work.data.title} description={`${work.data.title}, ${work.data.year}. ${work.data.medium}.`} image={socialImage}>
+  <article class="page container artwork-detail">
+    <div class="image-column">
+      <button class="image-button" type="button" data-open-viewer aria-label={`Open full-screen view of ${work.data.title}`}>
+        <ArtworkImage publicId={work.data.publicId} alt={work.data.alt} preset="detail" eager sizes="(max-width: 900px) 100vw, 72vw" />
+      </button>
+    </div>
+
+    <div class="metadata">
+      <p class="eyebrow">{categoryLabel(work.data.category)}</p>
+      <h1 class="page-title">{work.data.title}</h1>
+      <dl>
+        <div><dt>Year</dt><dd>{work.data.year}</dd></div>
+        <div><dt>Medium</dt><dd>{work.data.medium}</dd></div>
+        {work.data.dimensions && <div><dt>Dimensions</dt><dd>{work.data.dimensions}</dd></div>}
+        {work.data.series && <div><dt>Series</dt><dd>{work.data.series}</dd></div>}
+        {work.data.available && <div><dt>Status</dt><dd>Available</dd></div>}
+      </dl>
+      <CompareButton id={work.id} title={work.data.title} />
+      <div class="prose description"><Content /></div>
+    </div>
+
+    <nav class="work-nav" aria-label="Artwork navigation">
+      <a href={`/works/${previous.id}/`}>← {previous.data.title}</a>
+      <a href="/works/">Index</a>
+      <a href={`/works/${next.id}/`}>{next.data.title} →</a>
+    </nav>
+  </article>
+
+  <dialog class="viewer" data-viewer>
+    <button type="button" data-close-viewer aria-label="Close viewer">Close</button>
+    <ArtworkImage publicId={work.data.publicId} alt={work.data.alt} preset="lightbox" eager sizes="100vw" />
+  </dialog>
+
+  <CompareTray />
+</BaseLayout>
+
+<script>
+  const bindViewer = () => {
+    const dialog = document.querySelector<HTMLDialogElement>('[data-viewer]');
+    const open = document.querySelector<HTMLButtonElement>('[data-open-viewer]');
+    const close = document.querySelector<HTMLButtonElement>('[data-close-viewer]');
+    if (!dialog || !open || !close || open.dataset.bound === 'true') return;
+    open.dataset.bound = 'true';
+    open.addEventListener('click', () => dialog.showModal());
+    close.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  };
+  document.addEventListener('astro:page-load', bindViewer);
+  bindViewer();
+</script>
+
+<style>
+  .artwork-detail {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(16rem, 1fr);
+    gap: var(--space-12);
+  }
+  .image-button {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+  .image-button :global(img) {
+    width: 100%;
+    max-height: 78vh;
+    object-fit: contain;
+  }
+  .metadata { align-self: end; }
+  dl { margin-block: var(--space-8); }
+  dl div {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: var(--space-4);
+    border-top: var(--border);
+    padding-block: var(--space-2);
+    font-size: var(--step--1);
+  }
+  dt { color: var(--color-muted); }
+  dd { margin: 0; }
+  .description { margin-top: var(--space-8); font-size: var(--step-0); }
+  .work-nav {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--space-4);
+    border-top: var(--border);
+    padding-top: var(--space-6);
+    font-size: var(--step--1);
+  }
+  .work-nav a:last-child { text-align: right; }
+  .viewer {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    max-height: none;
+    border: 0;
+    background: var(--color-bg);
+    padding: var(--space-8);
+  }
+  .viewer::backdrop { background: var(--color-bg); }
+  .viewer button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+    border: var(--border);
+    background: var(--color-bg);
+    padding: 0.5rem 0.75rem;
+  }
+  .viewer :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  @media (max-width: 860px) {
+    .artwork-detail { grid-template-columns: 1fr; }
+    .metadata { align-self: start; }
+  }
+</style>

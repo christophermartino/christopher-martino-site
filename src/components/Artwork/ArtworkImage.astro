@@ -1,0 +1,57 @@
+---
+import { cloudinarySrcSet, cloudinaryUrl, type CloudinaryPreset } from '../../lib/cloudinary';
+
+interface Props {
+  publicId: string;
+  alt: string;
+  preset?: CloudinaryPreset;
+  eager?: boolean;
+  class?: string;
+  sizes?: string;
+}
+
+const {
+  publicId,
+  alt,
+  preset = 'gallery',
+  eager = false,
+  class: className,
+  sizes = '(max-width: 720px) 100vw, 50vw'
+} = Astro.props;
+
+const src = cloudinaryUrl(publicId, preset);
+const srcset = src ? cloudinarySrcSet(publicId) : '';
+---
+{src ? (
+  <img
+    class={className}
+    src={src}
+    srcset={srcset}
+    sizes={sizes}
+    alt={alt}
+    loading={eager ? 'eager' : 'lazy'}
+    fetchpriority={eager ? 'high' : 'auto'}
+    decoding="async"
+  />
+) : (
+  <div class:list={['image-placeholder', className]} role="img" aria-label={alt}>
+    <span>Cloudinary image</span>
+    <small>{publicId}</small>
+  </div>
+)}
+
+<style>
+  .image-placeholder {
+    display: grid;
+    place-content: center;
+    gap: 0.35rem;
+    aspect-ratio: 4 / 5;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--color-border) 65%, transparent), transparent),
+      var(--color-surface);
+    border: var(--border);
+    color: var(--color-muted);
+    text-align: center;
+  }
+  .image-placeholder small { font-size: 0.7rem; }
+</style>

@@ -1,0 +1,101 @@
+backend:
+  name: github
+  repo: christophermartino/christopher-martino-site
+  branch: main
+
+publish_mode: editorial_workflow
+site_url: https://your-domain.com
+display_url: https://your-domain.com
+logo_url: https://your-domain.com/favicon.svg
+
+# Artwork images remain in Cloudinary. Decap edits their public IDs.
+media_folder: public/uploads
+public_folder: /uploads
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: artwork
+    label: Artwork
+    label_singular: Artwork
+    folder: src/content/artwork
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    summary: "{{title}} — {{year}}"
+    sortable_fields: ["title", "year", "category", "order"]
+    view_filters:
+      - { label: Featured, field: featured, pattern: true }
+      - { label: Available, field: available, pattern: true }
+      - { label: Paintings, field: category, pattern: painting }
+      - { label: Drawings, field: category, pattern: drawing }
+      - { label: Digital, field: category, pattern: digital }
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Year, name: year, widget: number, value_type: int, min: 1900, max: 2100 }
+      - label: Category
+        name: category
+        widget: select
+        options:
+          - { label: Painting, value: painting }
+          - { label: Drawing, value: drawing }
+          - { label: Digital, value: digital }
+      - { label: Series, name: series, widget: string, required: false }
+      - { label: Medium, name: medium, widget: string }
+      - { label: Dimensions, name: dimensions, widget: string, required: false }
+      - { label: Cloudinary Public ID, name: publicId, widget: string, hint: "Example: painting/12" }
+      - { label: Image Alt Text, name: alt, widget: string }
+      - { label: Featured on Homepage, name: featured, widget: boolean, default: false }
+      - { label: Available, name: available, widget: boolean, default: false }
+      - { label: Display Order, name: order, widget: number, value_type: int, default: 100 }
+      - label: Tags
+        name: tags
+        widget: list
+        required: false
+        default: []
+      - { label: Description, name: body, widget: markdown, required: false }
+
+  - name: exhibitions
+    label: Exhibitions
+    label_singular: Exhibition
+    folder: src/content/exhibitions
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    summary: "{{title}} — {{venue}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Venue, name: venue, widget: string }
+      - { label: Location, name: location, widget: string }
+      - { label: Start Date, name: startDate, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+      - { label: End Date, name: endDate, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, required: false }
+      - { label: Featured, name: featured, widget: boolean, default: false }
+      - { label: Description, name: body, widget: markdown, required: false }
+
+  - name: pages
+    label: Pages
+    files:
+      - label: About
+        name: about
+        file: src/content/pages/about.md
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Body, name: body, widget: markdown }
+      - label: CV
+        name: cv
+        file: src/content/pages/cv.md
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Body, name: body, widget: markdown }
+      - label: Contact
+        name: contact
+        file: src/content/pages/contact.md
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Email, name: email, widget: string }
+          - { label: Body, name: body, widget: markdown, required: false }

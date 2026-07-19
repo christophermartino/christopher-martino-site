@@ -13,11 +13,6 @@ const exhibitions = (await getCollection('exhibitions'))
 const featuredExhibition = exhibitions.find((item) => item.data.featured) || exhibitions[0];
 ---
 <BaseLayout>
-  <div class="home-intro container">
-    <p class="eyebrow">New York</p>
-    <h1 class="display">Christopher<br />Martino</h1>
-    <p class="intro-copy">Paintings, drawings, and digital works.</p>
-  </div>
 
   <section class="section container">
     <div class="section-header">
@@ -86,4 +81,11 @@ const featuredExhibition = exhibitions.find((item) => item.data.featured) || exh
     .home-intro { min-height: 56vh; }
     .exhibition-feature { grid-template-columns: 1fr; }
   }
+  /* Removed from base layout
+    <div class="home-intro container">
+    <p class="eyebrow"></p>
+    <h1 class="display">Christopher<br />Martino</h1>
+    <p class="intro-copy">Paintings, drawings, and digital works.</p>
+  </div>
+  */
 </style>

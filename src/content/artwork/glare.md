@@ -5,7 +5,7 @@ category: painting
 series: Windows
 medium: Oil on canvas
 dimensions: 30 x 30 in.
-publicId: crystals
+publicId: painting/crystals
 alt: An oil painting.
 featured: true
 available: true

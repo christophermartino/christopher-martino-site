@@ -5,7 +5,7 @@ category: painting
 series: Windows
 medium: Oil on canvas
 dimensions: 12 x 16 in.
-publicId: broken-lampshade
+publicId: painting/broken-lampshade
 alt: An oil painting.
 featured: true
 available: true

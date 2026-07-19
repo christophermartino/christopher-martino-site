@@ -1,5 +1,5 @@
 ---
-title: Cordoruy
+title: Corduroy
 year: 2021
 category: painting
 series: Satellites
